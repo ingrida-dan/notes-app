@@ -7,39 +7,40 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="app-header">
-    <h1 class="app-title">Notes</h1>
-    <button id="new-note-btn" class="btn btn-primary" type="button">New Note</button>
-  </header>
-
-  <main class="container">
-    <!-- Editor form: hidden until creating or editing a note -->
-    <form id="editor" class="editor" hidden>
-      <input
-        id="note-title"
-        class="editor-title"
-        type="text"
-        placeholder="Title"
-        autocomplete="off"
-        maxlength="120">
-      <textarea
-        id="note-body"
-        class="editor-body"
-        placeholder="Write your note..."
-        rows="6"></textarea>
-      <p id="editor-error" class="editor-error" hidden>A note can't be completely empty.</p>
-      <div class="editor-actions">
-        <button id="save-btn" class="btn btn-primary" type="submit">Save</button>
-        <button id="cancel-btn" class="btn btn-ghost" type="button">Cancel</button>
+  <div class="app" id="app">
+    <!-- LEFT: note list -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h1 class="app-title">Notes</h1>
+        <button id="new-note-btn" class="btn btn-primary" type="button">New Note</button>
       </div>
-    </form>
+      <ul id="notes-list" class="notes-list" aria-label="Notes"></ul>
+    </aside>
 
-    <!-- Empty state: shown when there are no notes -->
-    <p id="empty-state" class="empty-state">No notes yet — create your first one</p>
+    <!-- RIGHT: editor / empty state -->
+    <main class="main">
+      <p id="empty-state" class="empty-state">Select a note or create a new one</p>
 
-    <!-- Notes render here -->
-    <section id="notes-list" class="notes-list" aria-live="polite"></section>
-  </main>
+      <section id="editor" class="editor" hidden>
+        <div class="editor-bar">
+          <button id="back-btn" class="btn-text back-btn" type="button">&larr; Notes</button>
+          <span id="editor-status" class="editor-status"></span>
+          <button id="delete-btn" class="btn-text danger" type="button" hidden>Delete</button>
+        </div>
+        <input
+          id="note-title"
+          class="editor-title"
+          type="text"
+          placeholder="Title"
+          autocomplete="off"
+          maxlength="120">
+        <textarea
+          id="note-body"
+          class="editor-body"
+          placeholder="Write your note..."></textarea>
+      </section>
+    </main>
+  </div>
 
   <script src="app.js"></script>
 </body>
