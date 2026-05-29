@@ -77,6 +77,8 @@ function showEditor() {
 function showEmpty() {
   editor.hidden = true;
   emptyState.hidden = false;
+  titleInput.value = "";
+  bodyInput.value = "";
   app.classList.remove("is-editing");
 }
 

@@ -155,6 +155,11 @@ body {
   overflow-y: auto;
 }
 
+/* `display: flex` above would override the `hidden` attribute, so restore it. */
+.editor[hidden] {
+  display: none;
+}
+
 .editor-bar {
   display: flex;
   align-items: center;
