@@ -168,6 +168,10 @@ body {
   font-size: 0.8rem;
 }
 
+.editor-status.error {
+  color: var(--danger);
+}
+
 .editor-title {
   font: inherit;
   font-size: 1.5rem;

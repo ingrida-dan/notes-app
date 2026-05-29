@@ -5,7 +5,7 @@ const STORAGE_KEY = "notes-app:notes";
 // ---- State ------------------------------------------------------------
 let notes = [];          // array of { id, title, body, updatedAt }
 let selectedId = null;   // id of the note open in the editor, or null
-let creating = false;    // true when a blank new-note draft is open (not yet saved)
+let isNewDraft = false;  // true while a brand-new note from this session is open
 
 // ---- Element references -----------------------------------------------
 const app = document.getElementById("app");
@@ -46,16 +46,25 @@ function loadNotes() {
   if (!raw) return [];
   try {
     const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return [];
-    // Drop anything that ended up completely empty (e.g. tab closed mid-edit).
-    return parsed.filter((n) => !isBlank(n.title) || !isBlank(n.body));
+    return Array.isArray(parsed) ? parsed : [];
   } catch {
     return [];
   }
 }
 
+// Returns true if the write succeeded, false if storage rejected it (e.g. full).
 function saveNotes() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function setStatus(message, isError) {
+  statusEl.textContent = message;
+  statusEl.classList.toggle("error", Boolean(isError));
 }
 
 // ---- Showing the editor vs. the empty state ---------------------------
@@ -74,12 +83,12 @@ function showEmpty() {
 // ---- Opening notes ----------------------------------------------------
 function openNew() {
   leaveCurrent();
-  creating = true;
+  isNewDraft = true;
   selectedId = null;
   titleInput.value = "";
   bodyInput.value = "";
   deleteBtn.hidden = true; // nothing to delete until the draft has content
-  statusEl.textContent = "";
+  setStatus("");
   showEditor();
   renderSidebar();
   titleInput.focus();
@@ -95,19 +104,20 @@ function openNote(id) {
   const note = notes.find((n) => n.id === id);
   if (!note) return;
 
-  creating = false;
+  isNewDraft = false;
   selectedId = id;
   titleInput.value = note.title;
   bodyInput.value = note.body;
   deleteBtn.hidden = false;
-  statusEl.textContent = "Saved";
+  setStatus("Saved");
   showEditor();
   renderSidebar();
 }
 
-// If the note we're leaving is completely empty, discard it.
+// Discard an abandoned new draft if it's still blank. Existing saved notes are
+// never auto-removed — they require the explicit Delete button.
 function leaveCurrent() {
-  if (selectedId !== null) {
+  if (isNewDraft && selectedId !== null) {
     const note = notes.find((n) => n.id === selectedId);
     if (note && isBlank(note.title) && isBlank(note.body)) {
       notes = notes.filter((n) => n.id !== selectedId);
@@ -115,7 +125,7 @@ function leaveCurrent() {
     }
   }
   selectedId = null;
-  creating = false;
+  isNewDraft = false;
 }
 
 // ---- Auto-save --------------------------------------------------------
@@ -123,27 +133,24 @@ function handleInput() {
   const title = titleInput.value;
   const body = bodyInput.value;
 
-  if (creating) {
-    // Don't persist a brand-new note until there's actually something in it.
-    if (isBlank(title) && isBlank(body)) return;
+  if (selectedId === null) {
+    // Blank new draft: don't persist until there's actually something in it.
+    if (!isNewDraft || (isBlank(title) && isBlank(body))) return;
 
     const note = { id: createId(), title, body, updatedAt: Date.now() };
     notes.push(note);
     selectedId = note.id;
-    creating = false;
     deleteBtn.hidden = false;
-  } else if (selectedId !== null) {
+  } else {
     const note = notes.find((n) => n.id === selectedId);
     if (!note) return;
     note.title = title;
     note.body = body;
     note.updatedAt = Date.now();
-  } else {
-    return;
   }
 
-  saveNotes();
-  statusEl.textContent = "Saved";
+  const saved = saveNotes();
+  setStatus(saved ? "Saved" : "Couldn't save — storage may be full", !saved);
   renderSidebar();
 }
 
@@ -158,7 +165,7 @@ function deleteCurrent() {
   notes = notes.filter((n) => n.id !== selectedId);
   saveNotes();
   selectedId = null;
-  creating = false;
+  isNewDraft = false;
   showEmpty();
   renderSidebar();
 }
@@ -223,6 +230,9 @@ deleteBtn.addEventListener("click", deleteCurrent);
 backBtn.addEventListener("click", goBack);
 titleInput.addEventListener("input", handleInput);
 bodyInput.addEventListener("input", handleInput);
+
+// Clean up an abandoned blank draft if the tab closes before navigating away.
+window.addEventListener("beforeunload", leaveCurrent);
 
 // ---- Startup ----------------------------------------------------------
 notes = loadNotes();
