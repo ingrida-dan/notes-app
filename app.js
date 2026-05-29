@@ -41,12 +41,24 @@ function sortedNotes() {
 }
 
 // ---- Storage ----------------------------------------------------------
+function isValidNote(n) {
+  return (
+    n !== null &&
+    typeof n === "object" &&
+    typeof n.id === "string" &&
+    typeof n.title === "string" &&
+    typeof n.body === "string" &&
+    typeof n.updatedAt === "number"
+  );
+}
+
 function loadNotes() {
   const raw = localStorage.getItem(STORAGE_KEY);
   if (!raw) return [];
   try {
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
+    // Drop malformed entries so they can't corrupt sorting or date rendering.
+    return Array.isArray(parsed) ? parsed.filter(isValidNote) : [];
   } catch {
     return [];
   }
