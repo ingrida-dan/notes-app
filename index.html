@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notes</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app" id="app">
+    <!-- LEFT: note list -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h1 class="app-title">Notes</h1>
+        <button id="new-note-btn" class="btn btn-primary" type="button">New Note</button>
+      </div>
+      <ul id="notes-list" class="notes-list" aria-label="Notes"></ul>
+    </aside>
+
+    <!-- RIGHT: editor / empty state -->
+    <main class="main">
+      <p id="empty-state" class="empty-state">Select a note or create a new one</p>
+
+      <section id="editor" class="editor" hidden>
+        <div class="editor-bar">
+          <button id="back-btn" class="btn-text back-btn" type="button">&larr; Notes</button>
+          <span id="editor-status" class="editor-status" aria-live="polite"></span>
+          <button id="delete-btn" class="btn-text danger" type="button" hidden>Delete</button>
+        </div>
+        <input
+          id="note-title"
+          class="editor-title"
+          type="text"
+          placeholder="Title"
+          aria-label="Note title"
+          autocomplete="off"
+          maxlength="120">
+        <textarea
+          id="note-body"
+          class="editor-body"
+          placeholder="Write your note..."
+          aria-label="Note body"></textarea>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
