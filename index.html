@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notes</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="app-header">
+    <h1 class="app-title">Notes</h1>
+    <button id="new-note-btn" class="btn btn-primary" type="button">New Note</button>
+  </header>
+
+  <main class="container">
+    <!-- Editor form: hidden until creating or editing a note -->
+    <form id="editor" class="editor" hidden>
+      <input
+        id="note-title"
+        class="editor-title"
+        type="text"
+        placeholder="Title"
+        autocomplete="off"
+        maxlength="120">
+      <textarea
+        id="note-body"
+        class="editor-body"
+        placeholder="Write your note..."
+        rows="6"></textarea>
+      <p id="editor-error" class="editor-error" hidden>A note can't be completely empty.</p>
+      <div class="editor-actions">
+        <button id="save-btn" class="btn btn-primary" type="submit">Save</button>
+        <button id="cancel-btn" class="btn btn-ghost" type="button">Cancel</button>
+      </div>
+    </form>
+
+    <!-- Empty state: shown when there are no notes -->
+    <p id="empty-state" class="empty-state">No notes yet — create your first one</p>
+
+    <!-- Notes render here -->
+    <section id="notes-list" class="notes-list" aria-live="polite"></section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
