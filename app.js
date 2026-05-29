@@ -97,6 +97,7 @@ function openNew() {
 function openNote(id) {
   if (id === selectedId) {
     showEditor(); // already open — on mobile this re-reveals the editor
+    titleInput.focus();
     return;
   }
   leaveCurrent();
@@ -112,6 +113,7 @@ function openNote(id) {
   setStatus("Saved");
   showEditor();
   renderSidebar();
+  titleInput.focus();
 }
 
 // Discard an abandoned new draft if it's still blank. Existing saved notes are
@@ -168,6 +170,7 @@ function deleteCurrent() {
   isNewDraft = false;
   showEmpty();
   renderSidebar();
+  newNoteBtn.focus();
 }
 
 function goBack() {
@@ -190,8 +193,12 @@ function renderSidebar() {
 function buildItem(note) {
   const li = document.createElement("li");
   li.className = "note-item";
-  if (note.id === selectedId) li.classList.add("selected");
+  li.setAttribute("role", "button");
   li.tabIndex = 0;
+  if (note.id === selectedId) {
+    li.classList.add("selected");
+    li.setAttribute("aria-current", "true");
+  }
 
   const title = document.createElement("div");
   title.className = "note-item-title";
